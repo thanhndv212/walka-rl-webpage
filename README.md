@@ -1,6 +1,6 @@
 # Walka RL Mjlab Webpage
 
-Project webpage for [walka_rl_mjlab](https://github.com/thanhndv212/walka_rl_mjlab) — bipedal locomotion via reinforcement learning on the Unitree WalkaOne humanoid robot.
+Project webpage for [walka_rl_mjlab](https://github.com/thanhndv212/walka_rl_mjlab) — bipedal locomotion via reinforcement learning on the Walka humanoid robot.
 
 ## Live Site
 
@@ -34,7 +34,7 @@ walka-rl-webpage/
 5. **Reward Design** — table of all sixteen reward terms with weights, kinds, and purposes
 6. **Docs & Resources** — links to `reward_design.md`, `vast_ai_training.md`, `kinematic_structure_analysis.md`, `get_up_task.md`
 7. **Installation** — clone, uv sync (CPU/GPU), usage examples (train, play, keyboard-steer, push to Hub)
-8. **Acknowledgements** — unitree_rl_mjlab, mjlab, RSL-RL, Unitree Robotics
+8. **Acknowledgements** — unitree_rl_mjlab (code structure inspiration), mjlab, RSL-RL
 
 ## Publishing to GitHub Pages
 
