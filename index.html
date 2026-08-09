@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Walka RL Mjlab: End-to-end reinforcement learning for bipedal locomotion on the Unitree WalkaOne humanoid robot using MuJoCo and mjlab.">
+  <meta name="keywords" content="WalkaOne, Unitree, bipedal locomotion, reinforcement learning, RSL-RL, PPO, MuJoCo, mjlab, humanoid robot, terrain navigation">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Walka RL Mjlab: Bipedal Locomotion via Reinforcement Learning</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+      <a class="navbar-item" href="https://thanhndv212.github.io">
+        <span class="icon">
+          <i class="fas fa-user"></i>
+        </span>
+        <span>Thanh D. V. Nguyen</span>
+      <span class="icon">
+          <i class="fas fa-home"></i>
+      </span>
+      </a>
+
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          More Research
+        </a>
+        <div class="navbar-dropdown">
+          <a class="navbar-item" href="https://thanhndv212.github.io/figaroh-plus-webpage/">
+            Figaroh - Robotic SysID toolbox
+          </a>
+          <a class="navbar-item" href="https://thanhndv212.github.io/tiago-calibration-webpage/">
+            Tiago - Mobile Manipulator Calibration
+          </a>
+          <a class="navbar-item" href="https://thanhndv212.github.io/talos-calibration-webpage/">
+            TALOS - Humanoid Calibration
+          </a>
+          <a class="navbar-item" href="https://thanhndv212.github.io/soarm-ws-webpage/">
+            SO-ARM Workspace - Full-Stack Manipulation
+          </a>
+          <a class="navbar-item" href="https://thanhndv212.github.io/walka-rl-webpage/">
+            Walka RL - Bipedal Locomotion
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Walka RL Mjlab: Bipedal Locomotion via Reinforcement Learning</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Thanh D. V. Nguyen</span>
+          </div>
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://github.com/thanhndv212/walka_rl_mjlab" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://www.unitree.com/" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-robot"></i>
+                  </span>
+                  <span>Hardware</span>
+                  </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="toc">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-4">Contents</h2>
+        <div class="content">
+          <div class="columns">
+            <div class="column is-half">
+              <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#demos">Training Demos</a></li>
+                <li><a href="#training-pipeline">RL Training Pipeline</a></li>
+                <li><a href="#terrain-types">Terrain Types &amp; Curriculum</a></li>
+              </ul>
+            </div>
+            <div class="column is-half">
+              <ul>
+                <li><a href="#reward-design">Reward Design</a></li>
+                <li><a href="#docs">Docs &amp; Resources</a></li>
+                <li><a href="#installation">Installation</a></li>
+                <li><a href="#acknowledgements">Acknowledgements</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="overview">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Overview</h2>
+        <div class="content has-text-justified">
+          <p>
+            <code>walka_rl_mjlab</code> trains bipedal locomotion policies for the Unitree WalkaOne humanoid robot
+            using PPO reinforcement learning in MuJoCo simulation. Built on
+            <a href="https://github.com/mujocolab/mjlab">mjlab</a>'s manager-based task framework and
+            <a href="https://github.com/leggedrobotics/rsl_rl">RSL-RL</a>, the system learns stable forward walking,
+            lateral strafing, and turning on both flat ground (<strong>Walka-Flat</strong>) and procedurally
+            generated rough terrain (<strong>Walka-Rough</strong>).
+          </p>
+          <p>
+            Two complete policies have been trained end-to-end on rented vast.ai RTX 4090 GPUs: <strong>Walka-Flat</strong>
+            (10,001 iterations, 4096 parallel environments, ~1h54m) achieves a stable forward walking gait on flat
+            ground, while <strong>Walka-Rough</strong> (9,900 iterations, 2048 environments, ~4h33m) navigates a
+            seven-terrain curriculum including pyramid stairs, slopes, random rough patches, and wave terrain. The
+            training pipeline integrates Weights &amp; Biases tracking, rented-GPU workflows documented in
+            <code>docs/vast_ai_training.md</code>, and Hugging Face Hub publishing for checkpoint archival.
+          </p>
+          <p>
+            The task follows a velocity-tracking formulation: a randomly-sampled forward/lateral velocity and yaw
+            rate command is issued each episode, and the policy is rewarded for matching it while staying upright,
+            avoiding self-collisions, and maintaining a natural gait rhythm. Sixteen reward terms shape the learned
+            behavior — every term is documented with its weight, mathematical formulation, and its effect on the
+            final gait in <code>docs/reward_design.md</code>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="demos">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Training Demos</h2>
+        <div class="content">
+          <h4>Walka-Flat: Stable Forward Walking</h4>
+          <p>
+            <img src="./static/images/walka_flat_trained.gif" alt="Trained Walka-Flat policy: stable forward walking gait" style="max-width:100%; height:auto;">
+          </p>
+          <p>
+            Trained on a flat ground for 10,001 iterations with 4096 parallel environments (~1h54m on a rented
+            RTX 4090). The policy learns a stable, rhythmic gait that tracks commanded forward velocity while
+            maintaining balance and avoiding foot slip.
+          </p>
+
+          <h4>Walka-Rough: Terrain Curriculum Navigation</h4>
+          <p>
+            <img src="./static/images/walka_rough_trained.gif" alt="Trained Walka-Rough policy: walking across terrain curriculum" style="max-width:100%; height:auto;">
+          </p>
+          <p>
+            Trained on a procedurally generated terrain curriculum mixing seven sub-terrain types (stairs, slopes,
+            random rough, wave, etc.) for 9,900 iterations with 2048 environments (~4h33m). The policy adapts its
+            gait to varying ground conditions, lifting feet higher over obstacles and adjusting stride length.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="training-pipeline">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">RL Training Pipeline</h2>
+        <div class="content">
+          <p>
+            The training loop runs entirely in MuJoCo via <a href="https://github.com/mujocolab/mjlab">mjlab</a>,
+            following a manager-based architecture where observations, actions, rewards, and terminations are composed
+            from independent, typed terms. Each training iteration collects 24 steps of rollout per parallel
+            environment, computes GAE advantages, and updates a 3-layer (128, 128, 64) ELU actor-critic with PPO's
+            clipped-surrogate objective.
+          </p>
+
+          <h4>1. Task Setup &amp; Command Sampling</h4>
+          <p>
+            Every episode begins with a randomized velocity command sampled from ranges that widen over the course of
+            training via <code>Curriculum/command_vel</code>. Forward velocity <code>lin_vel_x</code> starts narrow
+            at <code>(-1, 1)</code> m/s and widens to <code>(-2, 3)</code> m/s by iteration 240,000 steps; yaw rate
+            <code>ang_vel_z</code> widens from <code>±0.5</code> to <code>±0.7</code> rad/s over the same schedule.
+            The robot's initial joint configuration is also randomized (default posture ± 0.1 rad per joint) so the
+            policy never sees identical start conditions twice.
+          </p>
+
+          <h4>2. Observation &amp; Action Spaces</h4>
+          <p>
+            The policy observes noisy actor-group data: joint positions and velocities (uniform noise ±0.01 rad,
+            ±0.1 rad/s), base angular velocity (±0.2 rad/s), projected gravity, the commanded twist, a gait-phase
+            clock, and the last action. The critic sees clean, privileged observations plus base linear velocity
+            (not available in the real world). Actions are joint-position offsets around a default standing
+            posture, applied as PD targets in MuJoCo at each simulation step.
+          </p>
+
+          <h4>3. Reward Shaping</h4>
+          <p>
+            Sixteen reward terms guide the learned behavior. The two task-tracking terms
+            (<code>track_linear_velocity</code> and <code>track_angular_velocity</code>, combined weight 4.0)
+            reward matching the commanded twist. All other terms are shaping: <code>upright</code> keeps the pelvis
+            level, <code>pose</code> regularizes joint angles toward default, <code>foot_gait</code> encourages
+            alternating stance/swing rhythm, <code>foot_clearance</code> and <code>foot_swing_height</code> shape
+            foot trajectories, and penalties discourage self-collision, joint limits, foot slip, and jittery actions.
+            Every term's weight and effect is documented in <a href="#reward-design">Reward Design</a> below.
+          </p>
+
+          <h4>4. PPO Update &amp; Hyperparameters</h4>
+          <p>
+            After 24 steps of rollout, generalized advantage estimates (GAE, γ=0.99, λ=0.95) are computed and the
+            policy updates via PPO with ε=0.2 clip, 5 epochs over 4 minibatches, and adaptive learning rate
+            (starts at 1e-3, adjusts to keep KL divergence near 0.01). The actor and critic share hidden layers
+            (128, 128, 64) with ELU activations; observations are normalized via running statistics updated during
+            training.
+          </p>
+
+          <h4>5. Training on Rented GPUs</h4>
+          <p>
+            Both <strong>Walka-Flat</strong> and <strong>Walka-Rough</strong> were trained on rented vast.ai
+            RTX 4090 instances. The workflow — instance selection, environment setup, W&amp;B tracking,
+            checkpoint promotion criteria, and Hugging Face Hub publishing — is documented in
+            <code>docs/vast_ai_training.md</code>. Training produces rolling checkpoints logged to W&amp;B
+            (saved every 1000-1500 iterations to stay within artifact-storage quotas), and promoted checkpoints
+            are archived permanently to Hugging Face Hub via <code>scripts/push_to_hub.py</code>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="terrain-types">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Terrain Types &amp; Curriculum</h2>
+        <div class="content">
+          <p>
+            The <strong>Walka-Rough</strong> task trains on <code>ROUGH_TERRAINS_CFG</code>, a curriculum grid
+            mixing seven procedurally generated sub-terrain types. Each type presents different locomotion challenges:
+            discrete height steps, continuous slopes, random bumps, or sinusoidal waves. The trained policy learns
+            to adapt its gait to all of them — lifting feet higher on stairs, adjusting stride on slopes, and
+            maintaining balance over uneven ground.
+          </p>
+
+          <p>Below are isolated terrain demos: the same <strong>Walka-Rough</strong> checkpoint played back on
+          individual terrain types with a forced forward command (<code>--forward-speed 0.7</code>), demonstrating
+          the policy's adaptive behavior.</p>
+
+          <table style="width:100%; max-width:800px; margin: 0 auto;">
+            <tr>
+              <td style="text-align:center; padding:10px;">
+                <img src="./static/images/walka_rough_stairs.gif" alt="Walka-Rough on pyramid stairs" style="width:100%; max-width:360px;">
+                <br><sub><strong>pyramid_stairs</strong> — discrete height steps</sub>
+              </td>
+              <td style="text-align:center; padding:10px;">
+                <img src="./static/images/walka_rough_slope.gif" alt="Walka-Rough on sloped terrain" style="width:100%; max-width:360px;">
+                <br><sub><strong>hf_pyramid_slope</strong> — continuous incline/decline</sub>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align:center; padding:10px;">
+                <img src="./static/images/walka_rough_bumps.gif" alt="Walka-Rough on random rough terrain" style="width:100%; max-width:360px;">
+                <br><sub><strong>random_rough</strong> — random height bumps</sub>
+              </td>
+              <td style="text-align:center; padding:10px;">
+                <img src="./static/images/walka_rough_wave.gif" alt="Walka-Rough on wave terrain" style="width:100%; max-width:360px;">
+                <br><sub><strong>wave_terrain</strong> — sinusoidal rolling waves</sub>
+              </td>
+            </tr>
+          </table>
+
+          <p>
+            The curriculum's difficulty progression — flat platforms at the start, gradually denser/taller obstacles
+            — allows the policy to bootstrap from simpler terrain before facing the hardest challenges. This shaping
+            is critical: training on a uniform distribution of all terrain types from iteration zero often fails to
+            converge to any stable gait.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="reward-design">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Reward Design</h2>
+        <div class="content">
+          <p>
+            Sixteen reward terms shape the learned gait. Every term is computed at every simulation step and summed as
+            <code>Σ weight<sub>i</sub> × term<sub>i</sub>(env)</code>. The table below lists each term's weight,
+            kind (bonus or penalty), and one-line purpose; full mathematical formulations and detailed commentary are
+            in <code>docs/reward_design.md</code>.
+          </p>
+
+          <table class="table is-fullwidth">
+            <thead>
+              <tr>
+                <th>Term</th>
+                <th>Weight</th>
+                <th>Kind</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>track_linear_velocity</code></td>
+                <td>2.0</td>
+                <td>bonus</td>
+                <td>Match commanded forward/lateral velocity</td>
+              </tr>
+              <tr>
+                <td><code>track_angular_velocity</code></td>
+                <td>2.0</td>
+                <td>bonus</td>
+                <td>Match commanded yaw rate</td>
+              </tr>
+              <tr>
+                <td><code>upright</code></td>
+                <td>1.0</td>
+                <td>bonus</td>
+                <td>Keep pelvis level</td>
+              </tr>
+              <tr>
+                <td><code>pose</code></td>
+                <td>1.0</td>
+                <td>bonus</td>
+                <td>Stay near default joint angles, tolerance scales with speed</td>
+              </tr>
+              <tr>
+                <td><code>foot_gait</code></td>
+                <td>0.5</td>
+                <td>bonus</td>
+                <td>Match a fixed alternating stance/swing clock</td>
+              </tr>
+              <tr>
+                <td><code>dof_pos_limits</code></td>
+                <td>-1.0</td>
+                <td>penalty</td>
+                <td>Stay inside soft joint limits</td>
+              </tr>
+              <tr>
+                <td><code>self_collisions</code></td>
+                <td>-1.0</td>
+                <td>penalty</td>
+                <td>Avoid self-contact above 10N</td>
+              </tr>
+              <tr>
+                <td><code>stand_still</code></td>
+                <td>-1.0</td>
+                <td>penalty</td>
+                <td>Hold default pose when no command is active</td>
+              </tr>
+              <tr>
+                <td><code>foot_clearance</code></td>
+                <td>-2.0</td>
+                <td>penalty</td>
+                <td>Lift feet to target height during swing</td>
+              </tr>
+              <tr>
+                <td><code>foot_swing_height</code></td>
+                <td>-0.25</td>
+                <td>penalty</td>
+                <td>Hit target peak swing height at landing</td>
+              </tr>
+              <tr>
+                <td><code>action_rate_l2</code></td>
+                <td>-0.1</td>
+                <td>penalty</td>
+                <td>Smooth actions (discourage jitter)</td>
+              </tr>
+              <tr>
+                <td><code>foot_slip</code></td>
+                <td>-0.1</td>
+                <td>penalty</td>
+                <td>No foot sliding while in contact</td>
+              </tr>
+              <tr>
+                <td><code>soft_landing</code></td>
+                <td>-1e-5</td>
+                <td>penalty</td>
+                <td>Soft footfalls (tiny weight, mostly observational)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            Three additional terms (<code>body_ang_vel</code>, <code>angular_momentum</code>, <code>air_time</code>)
+            are wired into the reward manager but assigned zero weight — they remain inactive, available for future
+            ablation studies or gait variations (e.g., running vs. walking). The current weights produce the stable
+            walking gait seen in the training demos above; different weight combinations can bias the policy toward
+            other behaviors (faster forward speed at the cost of stability, more aggressive turning, etc.).
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="docs">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Docs &amp; Resources</h2>
+        <div class="content">
+          <ul>
+            <li>
+              <strong><a href="https://github.com/thanhndv212/walka_rl_mjlab/blob/main/docs/reward_design.md">reward_design.md</a></strong>
+              — full mathematical definitions and detailed commentary for all sixteen reward terms, with per-term
+              contribution analysis and ablation notes
+            </li>
+            <li>
+              <strong><a href="https://github.com/thanhndv212/walka_rl_mjlab/blob/main/docs/vast_ai_training.md">vast_ai_training.md</a></strong>
+              — step-by-step workflow for training on rented vast.ai RTX 4090 GPUs: instance selection, W&amp;B
+              tracking, checkpoint promotion criteria, and Hugging Face Hub publishing
+            </li>
+            <li>
+              <strong><a href="https://github.com/thanhndv212/walka_rl_mjlab/blob/main/docs/kinematic_structure_analysis.md">kinematic_structure_analysis.md</a></strong>
+              — kinematic chain breakdown, joint naming conventions, and MJCF parsing notes for the Unitree WalkaOne
+              robot description
+            </li>
+            <li>
+              <strong><a href="https://github.com/thanhndv212/walka_rl_mjlab/blob/main/docs/get_up_task.md">get_up_task.md</a></strong>
+              — design notes for a fallen-recovery task (not yet implemented): reward formulation, termination
+              conditions, and training strategy for getting the robot back to standing after a fall
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="installation">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Installation</h2>
+        <div class="content">
+          <p>Clone the repository:</p>
+          <pre><code>git clone https://github.com/thanhndv212/walka_rl_mjlab.git
+cd walka_rl_mjlab</code></pre>
+
+          <p>Install dependencies with <a href="https://docs.astral.sh/uv/">uv</a>. For CPU-only (dev machines without a GPU):</p>
+          <pre><code>make sync-cpu   # or: uv sync --extra cpu --group dev</code></pre>
+
+          <p>For GPU training (CUDA 12.8):</p>
+          <pre><code>make sync       # or: uv sync --extra cu128 --group dev</code></pre>
+
+          <h4>Usage Examples</h4>
+          <pre><code># List all registered tasks.
+uv run python scripts/list_envs.py
+
+# Train a policy (swap Walka-Flat for Walka-Rough to train on terrain).
+uv run python scripts/train.py Walka-Flat --env.scene.num-envs=4096
+
+# Play back a trained checkpoint in the viewer.
+uv run python scripts/play.py Walka-Flat \
+    --checkpoint-file logs/rsl_rl/walka_velocity/DATE/model_N.pt
+
+# Steer it yourself (native viewer only): W/S fwd-back, J/L strafe, Q/E turn, X stop.
+uv run python scripts/play.py Walka-Rough \
+    --checkpoint-file logs/.../model_N.pt --keyboard-steer
+
+# Record a demo clip on one terrain type, walking forward off the spawn platform.
+uv run python scripts/play.py Walka-Rough \
+    --checkpoint-file logs/.../model_N.pt \
+    --terrain random_rough --forward-speed 0.7 --video --no-terminations
+
+# Publish a promoted checkpoint to the Hugging Face Hub.
+uv run python scripts/push_to_hub.py \
+    --repo-id &lt;user&gt;/walka-velocity-flat \
+    --wandb-run-path &lt;entity&gt;/&lt;project&gt;/&lt;run_id&gt;</code></pre>
+
+          <p>
+            No local GPU needed for playback or visualization — see
+            <a href="https://github.com/thanhndv212/walka_rl_mjlab/blob/main/docs/vast_ai_training.md">vast_ai_training.md</a>
+            for the full rented-GPU workflow (instance selection, monitoring, promotion bar, Hugging Face Hub publish).
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="acknowledgements">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Acknowledgements</h2>
+        <div class="content">
+          <ul>
+            <li>
+              <a href="https://github.com/unitreerobotics/unitree_rl_mjlab">unitree_rl_mjlab</a> — this repo's
+              task and script structure mirrors it, and the gait-clock <code>phase</code> observation and
+              <code>feet_gait</code>/<code>stand_still</code> rewards are ported from its local velocity-task fork.
+            </li>
+            <li>
+              <a href="https://github.com/mujocolab/mjlab">mjlab</a> — the manager-based RL framework powering the
+              task setup, observation/action/reward/termination composition, and MuJoCo integration.
+            </li>
+            <li>
+              <a href="https://github.com/leggedrobotics/rsl_rl">RSL-RL</a> — PPO implementation used for all
+              training runs, with adaptive learning rate and GAE advantage estimation.
+            </li>
+            <li>
+              <a href="https://www.unitree.com/">Unitree Robotics</a> — hardware vendor for the WalkaOne humanoid
+              robot.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p>
+        This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+      </p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
